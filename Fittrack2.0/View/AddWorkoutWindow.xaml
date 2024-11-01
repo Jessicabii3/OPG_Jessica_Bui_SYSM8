@@ -1,0 +1,103 @@
+﻿<Window x:Class="Fittrack2._0.View.AddWorkoutWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:Fittrack2._0.View"
+        xmlns:model="clr-namespace:FitTrack2._0.Model"
+        Title="Add Workout" Height="450" Width="800">
+    <Window.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0.4">
+            <GradientStop Color="{StaticResource SecondaryColor2}" Offset="0.5"/>
+            <GradientStop Color="{StaticResource SecondaryColor_}" Offset="1.9"/>
+            <GradientStop Color="{StaticResource SecondaryColor4}" Offset="0.3"/>
+            <GradientStop Color="{StaticResource SecondaryColor_}" Offset="1.2"/>
+        </LinearGradientBrush>
+    </Window.Background>
+
+    <Window.Resources>
+        <!-- DataTemplates för dynamisk visning av Reps/Sets och Distance -->
+        <DataTemplate DataType="{x:Type model:StrengthWorkout}">
+            <StackPanel>
+                <TextBlock Text="Reps:" FontWeight="Bold" Margin="0,10,0,0"/>
+                <TextBox Text="{Binding Reps, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Sets:" FontWeight="Bold" Margin="0,10,0,0"/>
+                <TextBox Text="{Binding Sets, UpdateSourceTrigger=PropertyChanged}"/>
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type model:CardioWorkout}">
+            <StackPanel>
+                <TextBlock Text="Distance:" FontWeight="Bold" Margin="0,10,0,0"/>
+                <TextBox Text="{Binding Distance, UpdateSourceTrigger=PropertyChanged}"/>
+            </StackPanel>
+        </DataTemplate>
+    </Window.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        
+
+        <TextBlock Text="Add Workout" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" />
+
+        <!-- Workout Type ComboBox -->
+        <Grid Grid.Row="1" Margin="0,10,0,0">
+            <TextBlock Text="Workout Type:" />
+            <ComboBox ItemsSource="{Binding WorkoutTypes}"
+                      SelectedItem="{Binding WorkoutType, UpdateSourceTrigger=PropertyChanged}"
+                      Width="200" />
+        </Grid>
+
+        <!-- Workout Duration -->
+        <Grid Grid.Row="2" Margin="0,10,0,0">
+           
+            <TextBox x:Name="WorkoutDurationTextBox" Text="{Binding WorkoutDuration, UpdateSourceTrigger=PropertyChanged}" />
+            <TextBlock Text="Enter duration (hh:mm:ss)"
+                       Foreground="Gray"
+                       VerticalAlignment="Center"
+                       Margin="5,0,0,0"
+                       IsHitTestVisible="False">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Text, ElementName=WorkoutDurationTextBox}" Value="">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+        </Grid>
+
+        <!-- Calories Burned -->
+        
+        <Grid Grid.Row="3" Margin="0,10,0,0">
+            <TextBlock Text="Enter calories:" HorizontalAlignment="Left"/>
+            <TextBox x:Name="WorkoutCaloriesTextBox"
+                     Text="{Binding WorkoutCaloriesBurned, UpdateSourceTrigger=PropertyChanged}"
+                     Width="200" Margin="0,10,0,10"/>
+        </Grid>
+
+        <!-- Workout Notes -->
+        <Grid Grid.Row="4" Margin="0,10,0,0">
+            <!-- Dynamisk visning av fält baserat på Workout-typen -->
+            <TextBox x:Name="WorkoutNotesTextBox" Text="{Binding WorkoutNotes, UpdateSourceTrigger=PropertyChanged}" />
+        </Grid>
+        <ContentPresenter Content="{Binding Workout}" Grid.Row="5" Margin="0,10,0,0" />
+
+        <!-- Save and Cancel Buttons -->
+        <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
+            <Button Content="Save" Command="{Binding SaveCommand}" Width="100" Margin="0,0,10,0" />
+            <Button Content="Cancel" Command="{Binding CancelCommand}" Width="100" />
+        </StackPanel>
+    </Grid>
+        
+</Window>
