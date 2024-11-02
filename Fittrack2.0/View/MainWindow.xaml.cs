@@ -10,16 +10,15 @@ namespace Fittrack2._0.View
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
-    {
-       
+    { 
 
+       
         public MainWindow()
         {
             InitializeComponent();
-            ManageUser manageUser = ManageUser.Instance;
-            this.DataContext = new MainViewModel( manageUser);
+            this.DataContext = new MainViewModel();
         }
-       
+      
 
 
 
