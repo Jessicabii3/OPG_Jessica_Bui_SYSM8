@@ -14,10 +14,7 @@ namespace Fittrack2._0.View
         public RegisterUserWindow()
         {
             InitializeComponent();
-            // Använder ManageUser.Instance för att få Singleton-instansen
-            ManageUser manageUser = ManageUser.Instance;
-            // Skickar in instansen av RegisterUserWindow (this) till RegisterUserViewModel-konstruktorn
-            this.DataContext = new RegisterUserViewModel(manageUser, this);
+            this.DataContext = new RegisterUserViewModel();
         }
 
         private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
