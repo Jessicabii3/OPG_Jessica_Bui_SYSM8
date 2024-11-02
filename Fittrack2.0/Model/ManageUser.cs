@@ -22,7 +22,7 @@ namespace FitTrack2._0.Model
         // Lista över registrerade användare
         public static ObservableCollection<User> RegisteredUsers { get; set; } = new ObservableCollection<User>();
 
-        // Egenskap för att hålla koll på nuvarande inloggade användare
+        
         // Egenskap för att hålla koll på nuvarande inloggade användare
         private User? _loggedInUser;
         public User? LoggedInUser
@@ -53,10 +53,12 @@ namespace FitTrack2._0.Model
             var user2 = new User("Theo", "Password456!", "Norway", "What's my dogs name?", "Boran");
 
             //user1.UserWorkouts.Add(new CardioWorkout(DateTime.Parse("2024-10-30"), TimeSpan.FromMinutes(60), 6, "Morning run", user1.Username));
-            //user1.UserWorkouts.Add(new StrengthWorkout(DateTime.Parse("2024-10-31"), "Upper body", TimeSpan.FromMinutes(45), "Strength training", 4, 10, user1.Username));
+            //user1.UserWorkouts.Add(new StrengthWorkout(DateTime.Parse("2024-10-31"), "Upper body", TimeSpan.FromMinutes(45), "Strength training", 4, 10,user1.Username));
 
             //user2.UserWorkouts.Add(new CardioWorkout(DateTime.Parse("2024-10-30"), TimeSpan.FromMinutes(60), 6, "Jogging", user2.Username));
             //user2.UserWorkouts.Add(new StrengthWorkout(DateTime.Parse("2024-10-31"), "Leg Day", TimeSpan.FromMinutes(45), "Strength training", 4, 10, user2.Username));
+            user1.UserWorkouts.Add(new StrengthWorkout(DateTime.Parse("2024-10-31"), "Strength training", TimeSpan.FromMinutes(45), "Upper body", 4, 10, user1.Username));
+            user2.UserWorkouts.Add(new StrengthWorkout(DateTime.Parse("2024-10-31"), "Strength training", TimeSpan.FromMinutes(45), "Leg Day", 4, 10, user2.Username));
 
             RegisteredUsers.Add(_defaultAdmin);
             RegisteredUsers.Add(user1);
