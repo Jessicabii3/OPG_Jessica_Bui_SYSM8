@@ -17,8 +17,9 @@ namespace FitTrack2._0.ViewModel
 
     {
 
-        private readonly Window _workoutsWindow;
+        private readonly Window _addworkoutsWindow;
         private Visibility strenghtWorkoutVistbilty =Visibility.Collapsed;
+        private readonly ManageUser _userManager=ManageUser.Instance;
         public Visibility StrenghtWorkoutVisibility
 
         {
@@ -91,61 +92,42 @@ namespace FitTrack2._0.ViewModel
         public string WorkoutNotes { get; set; } = string.Empty;
 
         // Specifika egenskaper för Strength och Cardio
-        private int? _workoutReps;
-        public int? WorkoutReps
+        private int _workoutReps;
+        public int WorkoutReps
         {
-            get => (Workout as StrengthWorkout)?.Reps;
+            get => _workoutReps;
             set
             {
-                if (Workout is StrengthWorkout strengthWorkout)
-                {
-                    strengthWorkout.Reps = value ?? 0;
-                    CalculateCalories();
-                    OnPropertyChanged();
-                }
+                _workoutReps = value;
+                CalculateCalories();
+                OnPropertyChanged();
             }
         }
-        private int? _workoutSets;
-        public int? WorkoutSets
+        private int _workoutSets;
+        public int WorkoutSets
         {
-            //get => _workoutSets;
-            //set
-            //{
-            //    _workoutSets = value;
-            //    CalculateCalories();
-            //    OnPropertyChanged();
-            //}
-            get => (Workout as StrengthWorkout)?.Sets;
+            get => _workoutSets;
             set
             {
-                if (Workout is StrengthWorkout strengthWorkout)
-                {
-                    strengthWorkout.Sets = value ?? 0;
-                    CalculateCalories(); OnPropertyChanged();
-                }
+                _workoutSets = value;
+                CalculateCalories();
+                OnPropertyChanged();
             }
+            
 
 
         }
-        private int? _workoutDistance;
-        public int? WorkoutDistance
+        private int _workoutDistance;
+        public int WorkoutDistance
         {
-            //get => _workoutDistance;
-            //set
-            //{
-            //    _workoutDistance = value;
-            //    CalculateCalories();
-            //    OnPropertyChanged();
-            //}
-            get => (Workout as CardioWorkout)?.Distance;
+            get => _workoutDistance;
             set
             {
-                if (Workout is CardioWorkout cardioWorkout)
-                {
-                    cardioWorkout.Distance = value ?? 0;
-                    CalculateCalories(); OnPropertyChanged();
-                }
+                _workoutDistance = value;
+                CalculateCalories();
+                OnPropertyChanged();
             }
+           
         }
         public ObservableCollection<string> WorkoutTypes { get; } = new ObservableCollection<string> { "Strength", "Cardio" };
 
@@ -171,9 +153,9 @@ namespace FitTrack2._0.ViewModel
    
 
 
-        public AddWorkoutViewModel( Window workoutsWindow, Workout workoutToCopy = null)
+        public AddWorkoutViewModel( Window addworkoutsWindow, Workout workoutToCopy = null)
         {
-            _workoutsWindow = workoutsWindow;
+            _addworkoutsWindow = addworkoutsWindow;
             if (workoutToCopy != null)
             {
                 WorkoutDate = workoutToCopy.Date;
@@ -206,12 +188,12 @@ namespace FitTrack2._0.ViewModel
            
             if (WorkoutType == "Strength")
             {
-                Workout = new StrengthWorkout(WorkoutDate, WorkoutType, WorkoutDuration, WorkoutNotes, "Anna", WorkoutReps ?? 0, WorkoutSets ?? 0);
+                Workout = new StrengthWorkout(WorkoutDate, WorkoutType, WorkoutDuration, WorkoutNotes, _userManager.LoggedInUser.Username, WorkoutReps , WorkoutSets);
                 WorkoutDistance = 0;
             }
             else if (WorkoutType == "Cardio")
             {
-                Workout = new CardioWorkout(WorkoutDate, WorkoutDuration, WorkoutDistance ?? 0, WorkoutNotes, "Anna");
+                Workout = new CardioWorkout(WorkoutDate, WorkoutDuration, WorkoutDistance, WorkoutNotes,_userManager.LoggedInUser.Username);
                 WorkoutReps = 0;
                 WorkoutSets = 0;
             }
@@ -302,37 +284,40 @@ namespace FitTrack2._0.ViewModel
                     MessageBox.Show(errorMessage.ToString(), "Fel vid sparande", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return; // Avbryter sparandet
                 }
+
+            }
+            if(workoutType == "Strength")
+            {
+                StrengthWorkout workout = new StrengthWorkout(date:WorkoutDate,type:WorkoutType,duration:WorkoutDuration,notes:WorkoutNotes,username:_userManager.LoggedInUser.Username,reps:WorkoutReps,sets:WorkoutSets);
+                _userManager.LoggedInUser.UserWorkouts.Add(workout);
+            }
+            if (workoutType == "Cardio")
+            {
+                CardioWorkout workout = new CardioWorkout(date:WorkoutDate,duration:WorkoutDuration,distance: WorkoutDistance,notes: WorkoutNotes,owner:_userManager.LoggedInUser.Username);
+                _userManager.LoggedInUser.UserWorkouts.Add(workout);
             }
 
+            
 
-            //Workout newWorkout = WorkoutType == "Strength"
-            //    ? new StrengthWorkout(WorkoutDate, WorkoutType, WorkoutDuration, WorkoutNotes, "Anna", WorkoutReps ?? 0, WorkoutSets ?? 0)
-            //    : new CardioWorkout(WorkoutDate, WorkoutDuration, WorkoutDistance ?? 0, WorkoutNotes, "Anna");
 
-            _workoutsWindow.Show();
-            //OpenWorkoutWindow();
+           
+            OpenWorkoutWindow();
         }
       
         private void Cancel()
         {
-            _workoutsWindow.Show();
+            OpenWorkoutWindow();
 
         }
         private void OpenWorkoutWindow()
         {
             var workoutsWindow = new WorkoutsWindow();
-            Application.Current.MainWindow = workoutsWindow; 
+            Application.Current.MainWindow = workoutsWindow;
             workoutsWindow.Show();
+            _addworkoutsWindow.Close();
 
-            CloseAddWorkoutWindow();
         }
-        private void CloseAddWorkoutWindow()
-        {
-            var addWorkoutWindow = Application.Current.Windows
-                .OfType<Window>()
-                .FirstOrDefault(w => w.DataContext == this);
-            addWorkoutWindow?.Close();
-        }
+    
 
     }
 

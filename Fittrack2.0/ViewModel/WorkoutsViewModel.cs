@@ -34,13 +34,14 @@ namespace FitTtrack2._0.ViewModel
         
 
 
-        public WorkoutsViewModel(  Window workoutsWindow)
+        public WorkoutsViewModel(Window workoutsWindow)
         {
+            
             _workoutsWindow = workoutsWindow;
-          
-            Workouts = new ObservableCollection<Workout>();
+
+            Workouts = _userManager.LoggedInUser.UserWorkouts;
             AvailableTypes = new ObservableCollection<string> { "Cardio", "Strength" };
-            LoadWorkouts();
+            //LoadWorkouts();
 
             // Initialiserar kommandon
             DeleteWorkoutCommand = new RelayCommand(_ => DeleteWorkout(), _ => CanDeleteWorkout());
@@ -199,11 +200,9 @@ namespace FitTtrack2._0.ViewModel
 
         private void OpenAddWorkoutWindow()
         {
-            var addWorkoutViewModel= new AddWorkoutViewModel(_workoutsWindow);
+           
 
-            addWorkoutViewModel.WorkoutSaved += OnWorkoutSaved;
-
-            var addWorkoutWindow = new AddWorkoutWindow { DataContext = addWorkoutViewModel };
+            var addWorkoutWindow = new AddWorkoutWindow ();
             _workoutsWindow.Close();
             addWorkoutWindow.Show();
             // CloseCurrentWindow();
@@ -214,12 +213,7 @@ namespace FitTtrack2._0.ViewModel
             // ShowNewWindow(addWorkoutWindow);
         }
 
-        private void OnWorkoutSaved(Workout newWorkout)
-        {
-            Workouts.Add(newWorkout);
-            OnPropertyChanged();
-            
-        }
+       
 
         private void OpenUserDetails()
         {

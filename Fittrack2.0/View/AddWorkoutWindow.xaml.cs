@@ -10,9 +10,10 @@ namespace FitTrack2._0.View
         public AddWorkoutWindow()
         {
             InitializeComponent();
+            DataContext = new AddWorkoutViewModel(this);
 
-            AddWorkoutViewModel viewModel = new AddWorkoutViewModel(this);
-            DataContext = viewModel;
+           
+          
 
         }
     }
