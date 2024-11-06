@@ -18,26 +18,46 @@ namespace Fittrack2._0.ViewModel
         // Fält för att hålla redigeringsstatus
         private bool _isEditing;
         private readonly Workout _workout;
-       
-       
-
+        private Workout _originalWorkout;
         public Workout Workout => _workout;
         //private Workout _originalWorkout;
-
-        
         private ObservableCollection<Workout> _workouts;
        
-        private ManageUser _userManager;
+        private readonly ManageUser _userManager=ManageUser.Instance;
         public event Action RequestCloseDetails;
         public event Action WorkoutDeleted;
 
         // Konstruktor som tar träningspasset, listan över träningspass och användarhanteraren
-        public WorkoutDetailsViewModel(Workout workout, ObservableCollection<Workout> workouts, ManageUser userManager)
+        public WorkoutDetailsViewModel(Workout workout)
         {
             _workout = workout ?? throw new ArgumentNullException(nameof(workout));
-            _workouts = workouts ?? throw new ArgumentNullException(nameof(workouts));
-            _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
-           
+            // Skapa en kopia av _workout beroende på dess typ
+            if (_workout is StrengthWorkout strengthWorkout)
+            {
+                _originalWorkout = new StrengthWorkout(
+                        strengthWorkout.Date,               // date
+                        strengthWorkout.Type,               // type
+                        strengthWorkout.Duration,           // duration
+                        strengthWorkout.Notes,              // notes
+                        strengthWorkout.Owner,              // owner
+                        strengthWorkout.Sets,               // sets
+                        strengthWorkout.Reps                // reps
+                       );
+            }
+            else if (_workout is CardioWorkout cardioWorkout)
+            {
+                _originalWorkout = new CardioWorkout(
+                          cardioWorkout.Date,                 // date
+                          cardioWorkout.Duration,             // duration
+                          cardioWorkout.Distance,             // distance
+                          cardioWorkout.Notes,                // notes
+                          cardioWorkout.Owner                 // owner
+                      );
+            }
+
+
+
+
             // Initialisering av kommandon
             EditCommand = new RelayCommand(_ => EnableEditing());
             SaveCommand = new RelayCommand(_ => SaveWorkout(), _ => CanSave());
@@ -45,9 +65,9 @@ namespace Fittrack2._0.ViewModel
             CopyCommand = new RelayCommand(_ => CopyWorkout());
             DeleteCommand = new RelayCommand(_ => DeleteWorkout());
 
-            IsEditing = false; 
-
+            IsEditing = false;
         }
+        
 
         public bool IsEditing
         {
@@ -168,18 +188,10 @@ namespace Fittrack2._0.ViewModel
         public ICommand DeleteCommand { get; }
 
 
-        
-
-
         // Metod för att aktivera redigeringsläge
         private void EnableEditing() => IsEditing = true;
 
-        private void SaveWorkout()
-        {
-            IsEditing = false;
-            ReturnToWorkoutWindow();
-
-        }
+     
         // Kontroll om det är möjligt att spara ändringar
         private bool CanSave()
         {
@@ -209,13 +221,22 @@ namespace Fittrack2._0.ViewModel
 
             // Om alla kontroller har klarat, returnera true
             return true;
+
         }
-            
+        private void RestoreWorkout(Workout target, Workout original)
+        {
+            target.Date = original.Date;
+            target.Type = original.Type;
+            target.Duration = original.Duration;
+            target.CaloriesBurned = original.CaloriesBurned;
+            target.Notes = original.Notes;
+        }
+
 
         // Metod för att avbryta redigering och återställa till ursprungsvärdena
         private void CancelEditing()
         {
-            //RestoreWorkout(_workout, _originalWorkout); // Återställer ändringar
+            RestoreWorkout(_workout, _originalWorkout); // Återställer ändringar
             IsEditing = false; // Avsluta redigeringsläge
             OnPropertyChanged(string.Empty);
             ReturnToWorkoutWindow();
@@ -235,37 +256,45 @@ namespace Fittrack2._0.ViewModel
             };
 
             addWorkoutWindow.DataContext = addWorkoutViewModel;
-            Application.Current.MainWindow = addWorkoutWindow;
-            addWorkoutWindow.Show();
+            //Application.Current.MainWindow = addWorkoutWindow;
+            //addWorkoutWindow.Show();
 
-            CloseWorkoutDetailsWindow();
+            //CloseWorkoutDetails
+            ShowNewWindow(addWorkoutWindow);
 
+
+        }
+        private void SaveWorkout()
+        {
+            IsEditing = false;
+            ReturnToWorkoutWindow();
 
         }
         // Metod för att ta bort träningspasset från listan
         private void DeleteWorkout()
         {
-            if (_workouts.Contains(_workout))
+
+            if (_userManager.LoggedInUser?.UserWorkouts.Contains(_workout) == true)
             {
-                _workouts.Remove(_workout); // Ta bort workout från den lokala listan
+                _userManager.LoggedInUser.UserWorkouts.Remove(_workout);
             }
-            _userManager.LoggedInUser?.UserWorkouts.Remove(_workout);
-            
-
-
+            ReturnToWorkoutWindow();  
         }
-        private void CalculateCalories()
+        public int CalculateCalories()
         {
             if (_workout is StrengthWorkout strengthWorkout)
             {
                 // Kalkylerar kalorier för styrketräning
                 WorkoutCaloriesBurned = strengthWorkout.Sets * strengthWorkout.Reps * 5; 
+                return WorkoutCaloriesBurned;
             }
             else if (_workout is CardioWorkout cardioWorkout)
             {
                 // Kalkylerar kalorier för konditionsträning
-                WorkoutCaloriesBurned = (int)(cardioWorkout.Distance * 10); 
+                WorkoutCaloriesBurned = (int)(cardioWorkout.Distance * 10);
+                return WorkoutCaloriesBurned;
             }
+           return 0;
         }
 
 
@@ -281,18 +310,37 @@ namespace Fittrack2._0.ViewModel
         private void ReturnToWorkoutWindow()
         {
             var workoutsWindow = new WorkoutsWindow();
-            Application.Current.MainWindow = workoutsWindow; // Uppdaterar till WorkoutsWindow som huvudfönster
-            workoutsWindow.Show();
+            Application.Current.MainWindow = workoutsWindow;
+            ShowNewWindow(workoutsWindow);
+            //Application.Current.MainWindow = workoutsWindow; // Uppdaterar till WorkoutsWindow som huvudfönster
+            //workoutsWindow.Show();
 
-            CloseWorkoutDetailsWindow();
+            //CloseWorkoutDetailsWindow();
+
+
+
         }
-        // Metod för att stänga WorkoutDetailsWindow
-        private void CloseWorkoutDetailsWindow()
+        //Metod för att stänga WorkoutDetailsWindow
+        //private void CloseWorkoutDetailsWindow()
+        //{
+        //    var workoutDetailsWindow = Application.Current.Windows
+        //        .OfType<Window>()
+        //        .FirstOrDefault(w => w.DataContext == this);
+        //    workoutDetailsWindow?.Close();
+        //}
+        private void ShowNewWindow(Window window)
         {
-            var workoutDetailsWindow = Application.Current.Windows
-                .OfType<Window>()
-                .FirstOrDefault(w => w.DataContext == this);
-            workoutDetailsWindow?.Close();
+            var currentWindow = Application.Current.Windows
+                   .OfType<Window>()
+                   .FirstOrDefault(w => w.DataContext == this);
+
+            currentWindow?.Close();  // Stäng det aktiva fönstret
+            window.Show();  // Öppna det nya fönstret
+
+        }
+        private void CloseCurrentWindow()
+        {
+            Application.Current.MainWindow?.Close();
         }
 
     }

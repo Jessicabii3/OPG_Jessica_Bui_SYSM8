@@ -22,10 +22,10 @@ namespace Fittrack2._0.View
     public partial class UserDetailsWindow : Window
     {
 
-        public UserDetailsWindow(UserDetailsViewModel viewModel)
+        public UserDetailsWindow()
         {
             InitializeComponent();
-            DataContext = viewModel;
+            DataContext = new UserDetailsViewModel();
         }
 
 
