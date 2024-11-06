@@ -1,12 +1,12 @@
 ﻿using FitTrack2._0.Model;
 using System;
 using System.Windows;
-using Fittrack2._0.View;
+using FitTrack2._0.View;
 using System.Windows.Input;
 using FitTrack2._0.Commands;
 using FitTrack2._0.Helpers;
 
-namespace Fittrack2._0.ViewModel
+namespace FitTrack2._0.ViewModel
 {
     public class MainViewModel : BaseViewModel
     {
@@ -107,9 +107,9 @@ namespace Fittrack2._0.ViewModel
         public RelayCommand ResetPasswordCommand => new RelayCommand(execute => OpenResetPasswordWindow());
         public RelayCommand RegisterUserCommand => new RelayCommand(execute => OpenRegisterUserWindow());
 
-        public MainViewModel(ManageUser userManager)
+        public MainViewModel()
         {
-            _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+           
             _username = string.Empty;
             _password = string.Empty;
             _errorMessage = string.Empty;
@@ -170,32 +170,67 @@ namespace Fittrack2._0.ViewModel
 
         public void OpenResetPasswordWindow()
         {
-            var resetPasswordWindow = new ResetPasswordWindow(_userManager);
-            Application.Current.MainWindow = resetPasswordWindow;
-            resetPasswordWindow.Show();
-            CloseCurrentWindow();
+            //var resetPasswordWindow = new ResetPasswordWindow(_userManager);
+            //Application.Current.MainWindow = resetPasswordWindow;
+            //resetPasswordWindow.Show();
+            //CloseCurrentWindow();
+            //var resetPasswordWindow = new ResetPasswordWindow(_userManager);
+            //ShowNewWindow(resetPasswordWindow);
+            ShowAndCloseCurrentWindow(new ResetPasswordWindow(_userManager));
         }
 
         public void OpenRegisterUserWindow()
         {
-            var registerWindow = new RegisterUserWindow();
-            Application.Current.MainWindow = registerWindow;
-            registerWindow.Show();
-            CloseCurrentWindow();
+            //var registerWindow = new RegisterUserWindow();
+            //Application.Current.MainWindow = registerWindow;
+            //registerWindow.Show();
+            //CloseCurrentWindow();
+            //var registerWindow = new RegisterUserWindow();
+            //ShowNewWindow(registerWindow);
+            ShowAndCloseCurrentWindow(new RegisterUserWindow());
         }
 
         private void OpenWorkoutWindow()
         {
-            var workoutViewModel = new WorkoutsViewModel(_userManager);
-            var workoutWindow = new WorkoutsWindow { DataContext = workoutViewModel };
-            Application.Current.MainWindow = workoutWindow;
-            workoutWindow.Show();
-            CloseCurrentWindow();
+            //try
+            //{
+            //    var workoutViewModel = new WorkoutsViewModel();
+            //    var workoutWindow = new WorkoutsWindow { DataContext = workoutViewModel };
+            //    Application.Current.MainWindow = workoutWindow;
+            //    workoutWindow.Show();
+            //    CloseCurrentWindow();
+            //}
+            //catch (Exception ex)
+            //{
+            //    MessageBox.Show($"Fel vid öppning av workout window: {ex.Message}");
+            //}
+
+            //try
+            //{
+            //    var workoutWindow = new WorkoutsWindow();
+            //    ShowNewWindow(workoutWindow);
+            //}
+            //catch (Exception ex)
+            //{
+            //    MessageBox.Show($"Fel vid öppning av workout window: {ex.Message}");
+            //}
+            ShowAndCloseCurrentWindow(new WorkoutsWindow());
+
         }
 
         private void CloseCurrentWindow()
         {
             Application.Current.MainWindow?.Close();
+        }
+        private void ShowAndCloseCurrentWindow(Window newWindow)
+        {
+            // Visa det nya fönstret
+            newWindow.Show();
+
+            // Stäng det aktuella fönstret
+            Application.Current.Windows
+                .OfType<Window>()
+                .FirstOrDefault(w => w.DataContext == this)?.Close();
         }
     }
 }

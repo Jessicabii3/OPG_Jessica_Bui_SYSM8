@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 using FitTrack2._0.Commands;
 using FitTrack2._0.Helpers;
 using FitTrack2._0.Model;
-using Fittrack2._0.View;
+using FitTrack2._0.View;
 using System.Windows;
 
-namespace Fittrack2._0.ViewModel
+namespace FitTrack2._0.ViewModel
 {
     public class ResetPasswordViewModel : BaseViewModel
     {

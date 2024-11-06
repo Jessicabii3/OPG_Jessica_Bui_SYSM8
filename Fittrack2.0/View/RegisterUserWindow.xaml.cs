@@ -1,10 +1,10 @@
 ﻿using FitTrack2._0.Model;
-using Fittrack2._0.ViewModel;
+using FitTrack2._0.ViewModel;
 using System;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Fittrack2._0.View
+namespace FitTrack2._0.View
 {
     /// <summary>
     /// Interaction logic for RegisterUserWindow.xaml

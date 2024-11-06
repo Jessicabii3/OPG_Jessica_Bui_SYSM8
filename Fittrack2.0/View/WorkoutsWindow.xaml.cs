@@ -1,5 +1,5 @@
 ﻿using FitTrack2._0.Model;
-using Fittrack2._0.ViewModel;
+using FitTrack2._0.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,8 +13,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using FitTtrack2._0.ViewModel;
 
-namespace Fittrack2._0.View
+namespace FitTrack2._0.View
 {
     /// <summary>
     /// Interaction logic for WorkoutsWindow.xaml
@@ -22,13 +23,11 @@ namespace Fittrack2._0.View
     public partial class WorkoutsWindow : Window
     {
        
-        public WorkoutsWindow() : this(new WorkoutsViewModel(ManageUser.Instance))
-        {
-        }
-        public WorkoutsWindow(WorkoutsViewModel viewModel)
+       
+        public WorkoutsWindow()
         {
             InitializeComponent();
-            DataContext = viewModel;
+            DataContext = new WorkoutsViewModel(this);
 
            
         }

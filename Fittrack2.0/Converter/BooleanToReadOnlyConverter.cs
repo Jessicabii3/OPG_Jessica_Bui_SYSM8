@@ -6,22 +6,18 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
 
-namespace FitTrack2._0.Converter
+namespace Fittrack2._0.Converter
 {
-    public class StringToIntConverter:IValueConverter
+    public class BooleanToReadOnlyConverter:IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return value?.ToString() ?? "0";
+            return !(bool)value; // Om IsEditing är true, returnerar false för IsReadOnly
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (int.TryParse(value as string, out int result))
-            {
-                return result;
-            }
-            return 0;
+            throw new NotImplementedException();
         }
     }
 }

@@ -5,7 +5,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Fittrack2._0.ViewModel;
+using FitTrack2._0.ViewModel;
 
 namespace FitTrack2._0.Model
 {
@@ -49,16 +49,15 @@ namespace FitTrack2._0.Model
         private ManageUser()
         {
             _defaultAdmin = new AdminUser("Admin1", "Password1234!", "Sweden", "Fave Color?", "Blue");
-            var user1 = new User("Anna", "Password123!", "Sweden", "What's my cats name?", "Juicy");
-            var user2 = new User("Theo", "Password456!", "Norway", "What's my dogs name?", "Boran");
+            var user1 = new User("Anna", "Password123!", "Sweden", "What's my cats name?", "Miso");
+            var user2 = new User("Theo", "Password456!", "Norway", "What's my dogs name?", "Bog");
 
-            //user1.UserWorkouts.Add(new CardioWorkout(DateTime.Parse("2024-10-30"), TimeSpan.FromMinutes(60), 6, "Morning run", user1.Username));
-            //user1.UserWorkouts.Add(new StrengthWorkout(DateTime.Parse("2024-10-31"), "Upper body", TimeSpan.FromMinutes(45), "Strength training", 4, 10,user1.Username));
+            user1.UserWorkouts.Add(new CardioWorkout(DateTime.Parse("2024-10-30"), TimeSpan.FromMinutes(60), 6, "Morning run", user1.Username));
+            user1.UserWorkouts.Add(new StrengthWorkout(DateTime.Parse("2024-10-31"), "Upper body", TimeSpan.FromMinutes(45), "Strength training", user1.Username,4,6));
 
-            //user2.UserWorkouts.Add(new CardioWorkout(DateTime.Parse("2024-10-30"), TimeSpan.FromMinutes(60), 6, "Jogging", user2.Username));
-            //user2.UserWorkouts.Add(new StrengthWorkout(DateTime.Parse("2024-10-31"), "Leg Day", TimeSpan.FromMinutes(45), "Strength training", 4, 10, user2.Username));
-            user1.UserWorkouts.Add(new StrengthWorkout(DateTime.Parse("2024-10-31"), "Strength training", TimeSpan.FromMinutes(45), "Upper body", 4, 10, user1.Username));
-            user2.UserWorkouts.Add(new StrengthWorkout(DateTime.Parse("2024-10-31"), "Strength training", TimeSpan.FromMinutes(45), "Leg Day", 4, 10, user2.Username));
+            user2.UserWorkouts.Add(new CardioWorkout(DateTime.Parse("2024-10-30"), TimeSpan.FromMinutes(60), 6, "Jogging", user2.Username));
+            user2.UserWorkouts.Add(new StrengthWorkout(DateTime.Parse("2024-10-31"), "Leg Day", TimeSpan.FromMinutes(45), "Strength training", user2.Username,3,6));
+
 
             RegisteredUsers.Add(_defaultAdmin);
             RegisteredUsers.Add(user1);

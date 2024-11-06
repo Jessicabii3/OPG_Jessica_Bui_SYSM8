@@ -1,5 +1,5 @@
 ﻿
-using Fittrack2._0.View;
+using FitTrack2._0.View;
 using FitTrack2._0.Commands;
 using FitTrack2._0.Model;
 using System;
@@ -7,17 +7,21 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using FitTtrack2._0.ViewModel;
+using FitTrack2._0.ViewModel;
 
-namespace Fittrack2._0.ViewModel
+namespace FitTtrack2._0.ViewModel
 {
-    public class WorkoutsViewModel : BaseViewModel
+    public class WorkoutsViewModel :BaseViewModel
     {
         
         private Workout _originalWorkout;
-        public ObservableCollection<Workout> Workouts { get; private set; }
+        public ObservableCollection<Workout> Workouts { get; private set; } 
         private Workout? _selectedWorkout;
         private string _errorMessage = string.Empty;
-        private ManageUser _userManager;
+        private readonly ManageUser _userManager = ManageUser.Instance;
+        private readonly Window _workoutsWindow;
+
 
         // Kommandon
         public RelayCommand AddWorkoutCommand { get; }
@@ -30,9 +34,9 @@ namespace Fittrack2._0.ViewModel
         
 
 
-        public WorkoutsViewModel(ManageUser userManager)
+        public WorkoutsViewModel(  Window workoutsWindow)
         {
-            _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+            _workoutsWindow = workoutsWindow;
           
             Workouts = new ObservableCollection<Workout>();
             AvailableTypes = new ObservableCollection<string> { "Cardio", "Strength" };
@@ -122,6 +126,7 @@ namespace Fittrack2._0.ViewModel
 
         private void LoadWorkouts()
         {
+
             if (_userManager.LoggedInUser == null)
             {
                 ErrorMessage = "Ingen användare är inloggad.";
@@ -136,24 +141,14 @@ namespace Fittrack2._0.ViewModel
             else
             {
                 // Visa endast användarens egna träningspass
-                var userWorkouts = _userManager.GetWorkoutsForUser(_userManager.LoggedInUser.Username);
+                var userWorkouts = _userManager.GetWorkoutsForUser(_userManager.LoggedInUser?.Username);
                 Workouts = new ObservableCollection<Workout>(userWorkouts);
             }
             OnPropertyChanged(nameof(Workouts));
-        }
-
-       
-
-        private void OpenWorkoutDetails()
-        {
-            if (SelectedWorkout == null)
-            {
-                ErrorMessage = "Välj ett träningspass för att se detaljer.";
-                return;
-            }
-
             
         }
+
+      
 
         private void DeleteWorkout()
         {
@@ -185,38 +180,81 @@ namespace Fittrack2._0.ViewModel
         }
 
         private bool CanDeleteWorkout() => SelectedWorkout != null;
+
+
+        // Metod för att öppna nytt fönster och stänga det aktuella fönstret
+        private void ShowNewWindow(Window window)
+        {
+            var currentWindow = Application.Current.Windows
+                   .OfType<Window>()
+                   .FirstOrDefault(w => w.DataContext == this);
+
+            currentWindow?.Close();  // Stäng det aktiva fönstret
+            window.Show();  // Öppna det nya fönstret
+
+        }
+        private void CloseCurrentWindow()
+        {
+        }
+
         private void OpenAddWorkoutWindow()
         {
-            var addWorkoutWindow = new AddWorkoutWindow();
-            Application.Current.MainWindow = addWorkoutWindow; // Uppdaterar MainWindow till AddWorkoutWindow
+            var addWorkoutViewModel= new AddWorkoutViewModel(_workoutsWindow);
+
+            addWorkoutViewModel.WorkoutSaved += OnWorkoutSaved;
+
+            var addWorkoutWindow = new AddWorkoutWindow { DataContext = addWorkoutViewModel };
+            _workoutsWindow.Close();
             addWorkoutWindow.Show();
-            CloseCurrentWindow();
+            // CloseCurrentWindow();
+
+
+
+            //var addWorkoutWindow = new AddWorkoutWindow();
+            // ShowNewWindow(addWorkoutWindow);
+        }
+
+        private void OnWorkoutSaved(Workout newWorkout)
+        {
+            Workouts.Add(newWorkout);
+            OnPropertyChanged();
+            
         }
 
         private void OpenUserDetails()
         {
-            var userDetailsViewModel = new UserDetailsViewModel(_userManager);
+            
+            var userDetailsWindow = new UserDetailsWindow();
+            ShowNewWindow(userDetailsWindow);
+        }
 
-            // Skapa UserDetailsWindow och tilldela DataContext till UserDetailsViewModel
-            var userDetailsWindow = new UserDetailsWindow(userDetailsViewModel);
+        private void OpenWorkoutDetails()
+        {
+            if (SelectedWorkout == null)
+            {
+                ErrorMessage = "Välj ett träningspass för att se detaljer.";
+                return;
+            }
+            var workoutDetailsViewModel = new WorkoutDetailsViewModel(SelectedWorkout);
+            workoutDetailsViewModel.WorkoutSaved += LoadWorkouts;
+            workoutDetailsViewModel.RequestCloseDetails += () =>
+            {
+                // Ladda om träningspass för att inkludera eventuella ändringar
+                LoadWorkouts();
+            };
+            var workoutDetailsWindow = new WorkoutDetailsWindow(new WorkoutDetailsViewModel(SelectedWorkout));
+            ShowNewWindow(workoutDetailsWindow);
 
-            Application.Current.MainWindow = userDetailsWindow; // Sätt huvudfönstret till UserDetailsWindow
-            userDetailsWindow.Show();
-            CloseCurrentWindow();
+
         }
 
         private void LogOut()
         {
+           
             var mainWindow = new MainWindow();
-            Application.Current.MainWindow = mainWindow; // Uppdaterar MainWindow till MainWindow (huvudfönstret)
-            mainWindow.Show();
-            CloseCurrentWindow();
+            ShowNewWindow(mainWindow);
         }
-        private void CloseCurrentWindow()
-        {
-            // Stänger nuvarande fönster
-            Application.Current.MainWindow?.Close();
-        }
+       
        
     }
 }

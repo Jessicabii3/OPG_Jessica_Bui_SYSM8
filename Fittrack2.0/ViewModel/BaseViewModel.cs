@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Fittrack2._0.ViewModel
+namespace FitTrack2._0.ViewModel
 {
     public class BaseViewModel:INotifyPropertyChanged
     {

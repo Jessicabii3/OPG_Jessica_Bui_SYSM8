@@ -1,15 +1,14 @@
-﻿using Fittrack2._0.View;
+﻿using FitTrack2._0.View;
 using FitTrack2._0.Commands;
 using FitTrack2._0.Helpers;
 using FitTrack2._0.Model;
 using System.Collections.ObjectModel;
 using System.Windows;
 
-namespace Fittrack2._0.ViewModel
+namespace FitTrack2._0.ViewModel
 {
     public class RegisterUserViewModel : BaseViewModel
     {
-        public Window _registerUserWindow;
         private string? _username;
         private string? _password;
         private string? _confirmPassword;
@@ -17,7 +16,7 @@ namespace Fittrack2._0.ViewModel
         private string? _securityQuestion;
         private string? _securityAnswer;
         private string? _errorMessage;
-        private ManageUser _userManager;
+        private readonly ManageUser _userManager = ManageUser.Instance;
 
         // Egenskap för användarnamn
         public string? Username
@@ -103,13 +102,14 @@ namespace Fittrack2._0.ViewModel
         public RelayCommand RegisterUserCommand => new RelayCommand(execute => RegisterUser());
 
         // Kommando för att avbryta registrering
-        public RelayCommand CancelCommand => new RelayCommand(execute => Cancel());
+        public RelayCommand CancelCommand => new RelayCommand(execute => OpenMainWindow());
 
-        // Konstruktor som tar Window som parameter
-        public RegisterUserViewModel(ManageUser manager, Window registerWindow)
+
+
+        public RegisterUserViewModel()
         {
-            _userManager = manager;
-            _registerUserWindow = registerWindow;
+            
+            
             SelectedCountries = CountryManager.GetCountries();
 
             if (SelectedCountries.Count == 0)
@@ -165,11 +165,10 @@ namespace Fittrack2._0.ViewModel
                 );
 
                 _userManager.AddUser(newUser);
-
-                // Visa bekräftelse och öppna MainWindow
-                
                 OpenMainWindow();
-                _registerUserWindow.Close();
+
+
+               
             }
             else
             {
@@ -251,20 +250,23 @@ namespace Fittrack2._0.ViewModel
             return true;
         }
         // Metod för att avbryta och återgå till MainWindow
-        public void Cancel()
-        {
-            MainWindow mainWindow = new MainWindow();
-            Application.Current.MainWindow = mainWindow;
-            mainWindow.Show();
-            _registerUserWindow.Close();
-        }
+        //public void Cancel()
+        //{
+        //    MainWindow mainWindow = new MainWindow();
+        //    Application.Current.MainWindow = mainWindow;
+        //    mainWindow.Show();
+        //    _registerUserWindow.Close();
+        //}
 
-        
-        public void OpenMainWindow()
+
+        private void OpenMainWindow()
         {
             var mainWindow = new MainWindow();
-            Application.Current.MainWindow = mainWindow; 
+            Application.Current.MainWindow = mainWindow;
             mainWindow.Show();
+            Application.Current.Windows
+                .OfType<Window>()
+                .FirstOrDefault(w => w.DataContext == this)?.Close();
         }
     }
 }
