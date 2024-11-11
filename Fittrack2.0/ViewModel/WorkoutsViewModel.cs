@@ -165,19 +165,34 @@ namespace FitTtrack2._0.ViewModel
         }
         private void ApplyFilters()
         {
-            var filteredWorkouts = _userManager.GetAllWorkouts();
+            var filteredWorkouts = _userManager.LoggedInUser.UserWorkouts;
 
             if (FilterDate.HasValue)
-                filteredWorkouts = filteredWorkouts.Where(w => w.Date.Date == FilterDate.Value.Date);
-
+            {
+                var filterList = filteredWorkouts.Where(w => w.Date.Date == FilterDate.Value.Date).ToList();
+                foreach (var workout in filterList)
+                {
+                    Workouts.Add(workout);
+                }
+            }
+                
             if (!string.IsNullOrWhiteSpace(FilterType))
-                filteredWorkouts = filteredWorkouts.Where(w => w.Type.Equals(FilterType, StringComparison.OrdinalIgnoreCase));
-
+            {
+                var filterList = filteredWorkouts.Where(w => w.Type.Equals(FilterType, StringComparison.OrdinalIgnoreCase));
+                foreach(var workout in filterList)
+                {
+                    Workouts.Add(workout);
+                }
+            }
             if (FilterDuration.HasValue)
-                filteredWorkouts = filteredWorkouts.Where(w => w.Duration >= FilterDuration.Value);
-
-            Workouts = new ObservableCollection<Workout>(filteredWorkouts);
-            OnPropertyChanged(nameof(Workouts));
+            {
+                var filterList= filteredWorkouts.Where(w => w.Duration >= FilterDuration.Value);
+                foreach(var workout in filterList)
+                {
+                    Workouts.Add(workout);
+                }
+            }
+               
         }
 
         private bool CanDeleteWorkout() => SelectedWorkout != null;
@@ -200,20 +215,14 @@ namespace FitTtrack2._0.ViewModel
 
         private void OpenAddWorkoutWindow()
         {
-           
 
-            var addWorkoutWindow = new AddWorkoutWindow ();
+
+            var addWorkoutWindow = new AddWorkoutWindow();
             _workoutsWindow.Close();
             addWorkoutWindow.Show();
-            // CloseCurrentWindow();
 
 
-
-            //var addWorkoutWindow = new AddWorkoutWindow();
-            // ShowNewWindow(addWorkoutWindow);
         }
-
-       
 
         private void OpenUserDetails()
         {

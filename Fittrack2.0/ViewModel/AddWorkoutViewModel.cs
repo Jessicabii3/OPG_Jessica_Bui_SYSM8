@@ -207,7 +207,6 @@ namespace FitTrack2._0.ViewModel
 
         private void CalculateCalories()
         {
-
             
             if (Workout is StrengthWorkout && WorkoutReps > 0 && WorkoutSets > 0)
             {
@@ -221,7 +220,9 @@ namespace FitTrack2._0.ViewModel
             {
                 WorkoutCaloriesBurned = 0;
             }
+            
             OnPropertyChanged(nameof(WorkoutCaloriesBurned));
+
         }
 
 

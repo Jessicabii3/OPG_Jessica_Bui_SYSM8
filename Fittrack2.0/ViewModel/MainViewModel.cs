@@ -17,7 +17,8 @@ namespace FitTrack2._0.ViewModel
         private bool _isLoggedIn;
         private readonly ManageUser _userManager = ManageUser.Instance;
         private bool _isLoginButtonVisible;
-
+        private Window _mainWindow;
+        
         public string _sendkey;
         public string SendKey
         {
@@ -107,9 +108,9 @@ namespace FitTrack2._0.ViewModel
         public RelayCommand ResetPasswordCommand => new RelayCommand(execute => OpenResetPasswordWindow());
         public RelayCommand RegisterUserCommand => new RelayCommand(execute => OpenRegisterUserWindow());
 
-        public MainViewModel()
+        public MainViewModel(Window _mainWindow)
         {
-           
+            this._mainWindow =  _mainWindow;
             _username = string.Empty;
             _password = string.Empty;
             _errorMessage = string.Empty;
@@ -170,67 +171,30 @@ namespace FitTrack2._0.ViewModel
 
         public void OpenResetPasswordWindow()
         {
-            //var resetPasswordWindow = new ResetPasswordWindow(_userManager);
-            //Application.Current.MainWindow = resetPasswordWindow;
-            //resetPasswordWindow.Show();
-            //CloseCurrentWindow();
-            //var resetPasswordWindow = new ResetPasswordWindow(_userManager);
-            //ShowNewWindow(resetPasswordWindow);
-            ShowAndCloseCurrentWindow(new ResetPasswordWindow(_userManager));
+           
+            new ResetPasswordWindow().Show();
+            CloseCurrentWindow();
         }
 
         public void OpenRegisterUserWindow()
         {
-            //var registerWindow = new RegisterUserWindow();
-            //Application.Current.MainWindow = registerWindow;
-            //registerWindow.Show();
-            //CloseCurrentWindow();
-            //var registerWindow = new RegisterUserWindow();
-            //ShowNewWindow(registerWindow);
-            ShowAndCloseCurrentWindow(new RegisterUserWindow());
+           
+            new RegisterUserWindow().Show(); //Öppna registering, skapa ett nytt registerWindow
+            CloseCurrentWindow();
         }
 
         private void OpenWorkoutWindow()
         {
-            //try
-            //{
-            //    var workoutViewModel = new WorkoutsViewModel();
-            //    var workoutWindow = new WorkoutsWindow { DataContext = workoutViewModel };
-            //    Application.Current.MainWindow = workoutWindow;
-            //    workoutWindow.Show();
-            //    CloseCurrentWindow();
-            //}
-            //catch (Exception ex)
-            //{
-            //    MessageBox.Show($"Fel vid öppning av workout window: {ex.Message}");
-            //}
-
-            //try
-            //{
-            //    var workoutWindow = new WorkoutsWindow();
-            //    ShowNewWindow(workoutWindow);
-            //}
-            //catch (Exception ex)
-            //{
-            //    MessageBox.Show($"Fel vid öppning av workout window: {ex.Message}");
-            //}
-            ShowAndCloseCurrentWindow(new WorkoutsWindow());
+         
+            new WorkoutsWindow().Show();
+            CloseCurrentWindow();    
 
         }
 
         private void CloseCurrentWindow()
         {
-            Application.Current.MainWindow?.Close();
+            _mainWindow.Close();
         }
-        private void ShowAndCloseCurrentWindow(Window newWindow)
-        {
-            // Visa det nya fönstret
-            newWindow.Show();
-
-            // Stäng det aktuella fönstret
-            Application.Current.Windows
-                .OfType<Window>()
-                .FirstOrDefault(w => w.DataContext == this)?.Close();
-        }
+       
     }
 }

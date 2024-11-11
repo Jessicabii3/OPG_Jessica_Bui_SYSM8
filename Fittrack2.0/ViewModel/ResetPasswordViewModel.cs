@@ -15,7 +15,7 @@ namespace FitTrack2._0.ViewModel
     {
         public Window _resetPasswordWindow;
         public Window _mainWindow;
-        private ManageUser _userManager;
+        private ManageUser _userManager=ManageUser.Instance;
         
 
         // Användarnamn som anges av användaren
@@ -102,11 +102,11 @@ namespace FitTrack2._0.ViewModel
         public RelayCommand ResetPasswordCommand => new RelayCommand(execute => ResetPassword(), canExecute => CanResetPassword());
 
         // Konstruktor
-        public ResetPasswordViewModel(Window resetPasswordWindow,ManageUser userManager)
+        public ResetPasswordViewModel(Window resetPasswordWindow)
         {
-            _resetPasswordWindow = resetPasswordWindow ?? throw new ArgumentNullException(nameof(resetPasswordWindow));
-            _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+            _resetPasswordWindow = resetPasswordWindow;
             IsPasswordFieldsVisible = false;
+           
         }
         // Hämtar säkerhetsfrågan baserat på angivet användarnamn
         private void FetchSecurityQuestion()
@@ -150,7 +150,7 @@ namespace FitTrack2._0.ViewModel
         // Återställer användarens lösenord om alla krav är uppfyllda
         private void ResetPassword()
         {
-            var user = _userManager.GetUser(Username);
+            User user = _userManager.GetUser(Username);
             if (user != null && IsPasswordFieldsVisible)
             {
                 if (NewPassword == ConfirmPassword)
@@ -179,7 +179,9 @@ namespace FitTrack2._0.ViewModel
             {
                 Message = "Ange svaret på säkerhetsfrågan först.";
             }
+             user.Password=NewPassword;
         }
+       
         // Kontrollerar om lösenordsåterställningen kan genomföras
         private bool CanResetPassword()
         {

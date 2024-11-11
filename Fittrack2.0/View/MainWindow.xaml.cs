@@ -16,7 +16,7 @@ namespace FitTrack2._0.View
         public MainWindow()
         {
             InitializeComponent();
-            this.DataContext = new MainViewModel();
+            DataContext = new MainViewModel(this);
         }
       
 

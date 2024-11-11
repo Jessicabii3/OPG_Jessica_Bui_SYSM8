@@ -25,7 +25,7 @@ namespace FitTrack2._0.View
         public UserDetailsWindow()
         {
             InitializeComponent();
-            DataContext = new UserDetailsViewModel();
+            DataContext = new UserDetailsViewModel(this);
         }
 
 

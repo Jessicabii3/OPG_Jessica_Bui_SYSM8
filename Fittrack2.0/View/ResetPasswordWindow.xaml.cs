@@ -20,10 +20,10 @@ namespace FitTrack2._0.View
     /// </summary>
     public partial class ResetPasswordWindow : Window
     {
-        public ResetPasswordWindow(ManageUser userManager)
+        public ResetPasswordWindow()
         {
             InitializeComponent();
-            this.DataContext = new ResetPasswordViewModel(this,userManager);
+            DataContext = new ResetPasswordViewModel(this);
 
         }
         

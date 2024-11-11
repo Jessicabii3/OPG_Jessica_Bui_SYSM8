@@ -136,7 +136,7 @@ namespace FitTrack2._0.Model
         // Kontrollerar om ett användarnamn redan är taget
         public bool IsUsernameTaken(string username)
         {
-            return RegisteredUsers.Any(u => u.Username == username);
+            return RegisteredUsers.All(u => u.Username == username);
         }
         public void SignOut()
         {

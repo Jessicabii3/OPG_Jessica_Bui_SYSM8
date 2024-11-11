@@ -31,6 +31,7 @@ namespace FitTrack2._0.ViewModel
         // Konstruktor som tar träningspasset, listan över träningspass och användarhanteraren
         public WorkoutDetailsViewModel(Workout workout)
         {
+
             _workout = workout ?? throw new ArgumentNullException(nameof(workout));
             // Skapa en kopia av _workout beroende på dess typ
             if (_workout is StrengthWorkout strengthWorkout)
@@ -44,6 +45,7 @@ namespace FitTrack2._0.ViewModel
                         strengthWorkout.Sets,               
                         strengthWorkout.Reps                
                        );
+                WorkoutCaloriesBurned = _originalWorkout.CalculateCaloriesBurned();
             }
             else if (_workout is CardioWorkout cardioWorkout)
             {
@@ -54,6 +56,7 @@ namespace FitTrack2._0.ViewModel
                           cardioWorkout.Notes,               
                           cardioWorkout.Owner                 
                       );
+                WorkoutCaloriesBurned = _originalWorkout.CalculateCaloriesBurned();
             }
 
 

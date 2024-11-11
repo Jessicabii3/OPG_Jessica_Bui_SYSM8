@@ -15,18 +15,17 @@ namespace FitTrack2._0.ViewModel
 {
     public class UserDetailsViewModel : BaseViewModel
     {
-        private User _user;
+        
         private readonly ManageUser _userManager=ManageUser.Instance;
-
-        public UserDetailsViewModel()
+        private readonly Window _userDetailsWindow;
+        public UserDetailsViewModel(Window userDetailsWindow)
         {
-            
+            _userDetailsWindow=userDetailsWindow;
 
-            _user = ManageUser.Instance.LoggedInUser ?? throw new InvalidOperationException("Ingen användare är inloggad.");
-            Username = _user.Username;
-            SelectedCountry = _user.Country;
+            Username = _userManager.LoggedInUser.Username;
+            SelectedCountry = _userManager.LoggedInUser.Country;
             Countries=CountryManager.GetCountries();
-
+             
         }
         public string Username
         {
@@ -92,24 +91,23 @@ namespace FitTrack2._0.ViewModel
         public ObservableCollection<string> Countries { get; set; }
 
         // Kommandon för att spara och avbryta ändringar
-        public ICommand SaveUserCommand => new RelayCommand(_ => SaveUserDetails());
-        public ICommand CancelUserCommand => new RelayCommand(_ => Cancel());
+        public ICommand SaveUserCommand => new RelayCommand(_ => SaveUserDetails(), canExecute:e => true);
+        public ICommand CancelUserCommand => new RelayCommand(_ => Cancel(), canExecute: e => true);
        
 
         // Metod för att spara användaruppgifter med validering
         private void SaveUserDetails()
         {
-            _user.Username = Username;
-            _user.Country=SelectedCountry;
+            
             // Validera att användarnamnet är giltigt
             if (!ValidationHelper.IsValidUsername(Username))
             {
                 Message = "Användarnamn måste vara minst 3 tecken.";
                 return;
             }
-
+            var user=ManageUser.Instance.GetUser(Username);
             // Kontrollera om användarnamnet redan är upptaget
-            if (ManageUser.Instance.IsUsernameTaken(Username) && Username != _user.Username)
+            if (ManageUser.Instance.IsUsernameTaken(Username))
             {
                 Message = "Användarnamnet är redan upptaget.";
                 return;
@@ -129,35 +127,32 @@ namespace FitTrack2._0.ViewModel
                     return;
                 }
 
-                // Uppdaterar lösenord om det valideras korrekt
-                _user.Password = NewPassword;
-                _user.Username = Username;
-                _user.Country = SelectedCountry;
+                //// Uppdaterar lösenord om det valideras korrekt
+                //_user.Password = NewPassword;
+                //_user.Username = Username;
+                //_user.Country = SelectedCountry;
             }
-            
-          var workoutsWindow= new WorkoutsWindow();
-           ShowNewWindow(workoutsWindow);
+            // Uppdaterar lösenord om det valideras korrekt
+            _userManager.LoggedInUser.Username = Username;
+            _userManager.LoggedInUser.Password = NewPassword;
+            _userManager.LoggedInUser.Country = SelectedCountry;
+
+            //var workoutsWindow= new WorkoutsWindow();
+            _userDetailsWindow.Close();
+           //ShowNewWindow(workoutsWindow);
 
         }
         private void Cancel()
         {
             var workoutsWindow = new WorkoutsWindow();
-            ShowNewWindow(workoutsWindow);
+            workoutsWindow.Show();
+            CloseCurrentWindow();
+
         }
        
-        private void ShowNewWindow(Window window)
-        {
-            var currentWindow = Application.Current.Windows
-                   .OfType<Window>()
-                   .FirstOrDefault(w => w.DataContext == this);
-
-            currentWindow?.Close();  // Stäng det aktiva fönstret
-            window.Show();  // Öppna det nya fönstret
-
-        }
         private void CloseCurrentWindow()
         {
-            Application.Current.MainWindow?.Close();
+            _userDetailsWindow.Close();
         }
 
 
