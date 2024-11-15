@@ -101,8 +101,8 @@
                             Command="{Binding RegisterUserCommand}">
 
                 </Button>
-                <TextBlock Text="{Binding ErrorMessage}" Foreground="Red" />
             </StackPanel>
+                <TextBlock Text="{Binding ErrorMessage}" Foreground="Red" />
         </StackPanel>
 
     </Border>
