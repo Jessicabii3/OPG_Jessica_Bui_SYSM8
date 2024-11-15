@@ -42,12 +42,12 @@
                 <TextBlock Text="Type:" VerticalAlignment="Center"/>
                 <ComboBox Width="150" ItemsSource="{Binding AvailableTypes}" SelectedItem="{Binding FilterType}" Margin="5,0"/>
 
-                <TextBlock Text="Duration:" VerticalAlignment="Center"/>
-                <TextBox Text="{Binding FilterDuration}" Width="100" Margin="5,0"/>
+               
+                <Button Content="Clear filter"  Command="{Binding ClearfilterCommand}" Width="80"/>
             </StackPanel>
 
             <!-- ListBox för att visa träningspass -->
-            <ListBox Grid.Row="1" ItemsSource="{Binding Workouts}" SelectedItem="{Binding SelectedWorkout}" Margin="0,0,0,10">
+            <ListBox Grid.Row="1" ItemsSource="{Binding WorkoutsList}" SelectedItem="{Binding SelectedWorkout}" Margin="0,0,0,10">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal" Margin="5">
@@ -70,14 +70,14 @@
                 <Button Content="Delete Workout" Command="{Binding DeleteWorkoutCommand}" Width="100" Margin="0,0,10,0">
                     <Button.Style>
                         <Style TargetType="Button">
-                            <Setter Property="IsEnabled" Value="False"/>
+                           
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding SelectedWorkout}" Value="{x:Null}">
+                                <!--<DataTrigger Binding="{Binding SelectedWorkout}" Value="{x:Null}">
                                     <Setter Property="IsEnabled" Value="False"/>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding SelectedWorkout}" Value="{x:Null}">
+                                </DataTrigger>-->
+                                <!--<DataTrigger Binding="{Binding SelectedWorkout}" Value="{x:Null}">
                                     <Setter Property="IsEnabled" Value="True"/>
-                                </DataTrigger>
+                                </DataTrigger>-->
                             </Style.Triggers>
                         </Style>
                     </Button.Style>

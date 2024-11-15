@@ -118,7 +118,7 @@ namespace FitTrack2._0.ViewModel
             _isLoginButtonVisible = false;
         }
 
-        private void ExecuteSendKey()
+        private  void ExecuteSendKey()
         {
             Random random = new Random();
             Key = random.Next(100000, 999999);

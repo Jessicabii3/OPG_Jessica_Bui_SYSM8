@@ -11,8 +11,8 @@ namespace FitTrack2._0.Model
         // Egenskaper för repetitions och set
         public  int Reps { get; set; }
         public int Sets { get; set; }
-        public StrengthWorkout(DateTime date, string type, TimeSpan duration, string notes, string username, int reps, int sets)
-            : base(date, type, duration, notes, username)
+        public StrengthWorkout(DateTime date, string type, TimeSpan duration, string notes, string username, int reps, int sets, int id)
+            : base(date, "Strength", duration, notes, username, id)
         {
             Reps = reps;
             Sets = sets;

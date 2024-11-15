@@ -11,8 +11,8 @@ namespace FitTrack2._0.Model
         //Egenskap
         public new int Distance { get; set; }
 
-        public CardioWorkout(DateTime date, TimeSpan duration, int distance, string notes, string owner)
-            : base(date, "Cardio", duration, notes, owner)
+        public CardioWorkout(DateTime date, TimeSpan duration, int distance, string notes, string owner, int id)
+            : base(date, "Cardio", duration, notes, owner, id)
         {
             Distance = distance;
         }

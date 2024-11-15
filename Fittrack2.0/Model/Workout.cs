@@ -15,15 +15,16 @@ namespace FitTrack2._0.Model
         public int CaloriesBurned { get; set; }
         public string Notes { get; set; }
         public string Owner { get; set; }  // Ägaren till träningspasset(användarnamn)
-
+        public int Id { get; set; }
         //Konstruktor
-        public Workout(DateTime date, string type, TimeSpan duration, string notes, string owner)
+        public Workout(DateTime date, string type, TimeSpan duration, string notes, string owner, int id)
         {
             Date = date;
             Type = type;
             Duration = duration;
             Notes = notes;
             Owner = owner;
+            Id = id;
         }
       
         public virtual int CalculateCaloriesBurned()

@@ -18,6 +18,8 @@ namespace FitTrack2._0.ViewModel
         
         private readonly ManageUser _userManager=ManageUser.Instance;
         private readonly Window _userDetailsWindow;
+        public ICommand SaveUserCommand { get; set; }
+        public ICommand CancelUserCommand { get; set; }
         public UserDetailsViewModel(Window userDetailsWindow)
         {
             _userDetailsWindow=userDetailsWindow;
@@ -25,7 +27,9 @@ namespace FitTrack2._0.ViewModel
             Username = _userManager.LoggedInUser.Username;
             SelectedCountry = _userManager.LoggedInUser.Country;
             Countries=CountryManager.GetCountries();
-             
+           
+            SaveUserCommand= new RelayCommand(execute: e => SaveUserDetails(), canExecute: e => true);
+            CancelUserCommand = new RelayCommand(_ => Cancel(), canExecute: e => true);
         }
         public string Username
         {
@@ -90,9 +94,8 @@ namespace FitTrack2._0.ViewModel
         // Samling av länder som användaren kan välja mellan
         public ObservableCollection<string> Countries { get; set; }
 
-        // Kommandon för att spara och avbryta ändringar
-        public ICommand SaveUserCommand => new RelayCommand(_ => SaveUserDetails(), canExecute:e => true);
-        public ICommand CancelUserCommand => new RelayCommand(_ => Cancel(), canExecute: e => true);
+    
+       
        
 
         // Metod för att spara användaruppgifter med validering
@@ -107,7 +110,7 @@ namespace FitTrack2._0.ViewModel
             }
             var user=ManageUser.Instance.GetUser(Username);
             // Kontrollera om användarnamnet redan är upptaget
-            if (ManageUser.Instance.IsUsernameTaken(Username))
+            if (!ManageUser.Instance.IsUsernameTaken(Username))
             {
                 Message = "Användarnamnet är redan upptaget.";
                 return;
@@ -127,19 +130,16 @@ namespace FitTrack2._0.ViewModel
                     return;
                 }
 
-                //// Uppdaterar lösenord om det valideras korrekt
-                //_user.Password = NewPassword;
-                //_user.Username = Username;
-                //_user.Country = SelectedCountry;
             }
             // Uppdaterar lösenord om det valideras korrekt
             _userManager.LoggedInUser.Username = Username;
             _userManager.LoggedInUser.Password = NewPassword;
             _userManager.LoggedInUser.Country = SelectedCountry;
 
-            //var workoutsWindow= new WorkoutsWindow();
+            var workoutsWindow = new WorkoutsWindow();
+            workoutsWindow.Show();
             _userDetailsWindow.Close();
-           //ShowNewWindow(workoutsWindow);
+         
 
         }
         private void Cancel()

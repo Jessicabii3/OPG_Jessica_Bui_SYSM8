@@ -23,7 +23,7 @@ namespace FitTrack2._0.View
     public partial class WorkoutDetailsWindow : Window
     {
       
-        public WorkoutDetailsWindow(WorkoutDetailsViewModel viewModel)
+        public WorkoutDetailsWindow(WorkoutDetailsViewModel? viewModel=null)
         {
             InitializeComponent();
             this.DataContext = viewModel;

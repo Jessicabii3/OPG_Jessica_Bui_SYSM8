@@ -17,6 +17,7 @@ namespace FitTrack2._0.ViewModel
         private string? _securityAnswer;
         private string? _errorMessage;
         private readonly ManageUser _userManager = ManageUser.Instance;
+     
 
         // Egenskap för användarnamn
         public string? Username
@@ -108,7 +109,7 @@ namespace FitTrack2._0.ViewModel
 
         public RegisterUserViewModel()
         {
-            
+           
             
             SelectedCountries = CountryManager.GetCountries();
 
@@ -127,6 +128,7 @@ namespace FitTrack2._0.ViewModel
             if (!ValidateUsername())
             {
                 isValid = false;
+
             }
 
             // Validera lösenord
@@ -163,17 +165,20 @@ namespace FitTrack2._0.ViewModel
                     securityQuestion: SecurityQuestion,
                     securityAnswer: SecurityAnswer
                 );
-
+                try
+                {
                 _userManager.AddUser(newUser);
-                OpenMainWindow();
+                 OpenMainWindow();
 
+                }
+                catch(Exception ex)
+                {
+
+                }
 
                
             }
-            else
-            {
-                ErrorMessage = "Vänligen korrigera felen och försök igen.";
-            }
+            
         }
 
         
@@ -184,6 +189,12 @@ namespace FitTrack2._0.ViewModel
             if (string.IsNullOrWhiteSpace(Username))
             {
                 ErrorMessage = "Användarnamn kan inte vara tomt.";
+                return false;
+            }
+           
+            if (!ValidationHelper.IsValidUsername(Username) ) 
+            {
+                ErrorMessage = "Användarnamnet måste vara minst 3 tecken";
                 return false;
             }
 
@@ -249,14 +260,7 @@ namespace FitTrack2._0.ViewModel
 
             return true;
         }
-        // Metod för att avbryta och återgå till MainWindow
-        //public void Cancel()
-        //{
-        //    MainWindow mainWindow = new MainWindow();
-        //    Application.Current.MainWindow = mainWindow;
-        //    mainWindow.Show();
-        //    _registerUserWindow.Close();
-        //}
+
 
 
         private void OpenMainWindow()

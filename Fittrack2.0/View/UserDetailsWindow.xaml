@@ -68,11 +68,13 @@
                     <ComboBox ItemsSource="{Binding Countries}" SelectedItem="{Binding SelectedCountry}"/>
                 </StackPanel>
                 <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20">
-                    <Button Content="Save" Command="{Binding SaveUserCommand}" />
+                    <Button Content="Save"  Command="{Binding SaveUserCommand}" />
                     <Button Content="Cancel" Command="{Binding CancelUserCommand }" Margin="10,0,0,0"/>
                     
                 </StackPanel>
-                <TextBlock Text="{Binding Message}" Foreground="Red" FontWeight="Bold" HorizontalAlignment="Center" Grid.Row="3"/>
+                <StackPanel Grid.Row="3"> 
+                <TextBlock Text="{Binding Message}" Foreground="Red" FontWeight="Bold" HorizontalAlignment="Center" />
+                </StackPanel>
             </Grid>
             
         </Border>

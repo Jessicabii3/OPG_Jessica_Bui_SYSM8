@@ -18,9 +18,10 @@ namespace FitTrack2._0.Model
 
         // Publik åtkomst till Singleton-instansen
         public static ManageUser Instance => _instance.Value;
+       
 
         // Lista över registrerade användare
-        public static ObservableCollection<User> RegisteredUsers { get; set; } = new ObservableCollection<User>();
+        public  ObservableCollection<User> RegisteredUsers { get; set; } = new ObservableCollection<User>();
 
         
         // Egenskap för att hålla koll på nuvarande inloggade användare
@@ -52,11 +53,11 @@ namespace FitTrack2._0.Model
             var user1 = new User("Anna", "Password123!", "Sweden", "What's my cats name?", "Miso");
             var user2 = new User("Theo", "Password456!", "Norway", "What's my dogs name?", "Bog");
 
-            user1.UserWorkouts.Add(new CardioWorkout(DateTime.Parse("2024-10-30"), TimeSpan.FromMinutes(60), 6, "Morning run", user1.Username));
-            user1.UserWorkouts.Add(new StrengthWorkout(DateTime.Parse("2024-10-31"), "Upper body", TimeSpan.FromMinutes(45), "Strength training", user1.Username,4,6));
+            user1.UserWorkouts.Add(new CardioWorkout(DateTime.Parse("2024-10-30"), TimeSpan.FromMinutes(60), 6, "Morning run", user1.Username, 12));
+            user1.UserWorkouts.Add(new StrengthWorkout(DateTime.Parse("2024-10-31"), "Upper body", TimeSpan.FromMinutes(45), "Strength training", user1.Username,4,6, 34));
 
-            user2.UserWorkouts.Add(new CardioWorkout(DateTime.Parse("2024-10-30"), TimeSpan.FromMinutes(60), 6, "Jogging", user2.Username));
-            user2.UserWorkouts.Add(new StrengthWorkout(DateTime.Parse("2024-10-31"), "Leg Day", TimeSpan.FromMinutes(45), "Strength training", user2.Username,3,6));
+            user2.UserWorkouts.Add(new CardioWorkout(DateTime.Parse("2024-10-30"), TimeSpan.FromMinutes(60), 6, "Jogging", user2.Username, 35));
+            user2.UserWorkouts.Add(new StrengthWorkout(DateTime.Parse("2024-10-31"), "Leg Day", TimeSpan.FromMinutes(45), "Strength training", user2.Username,3,6,13));
 
 
             RegisteredUsers.Add(_defaultAdmin);
@@ -90,6 +91,7 @@ namespace FitTrack2._0.Model
         // Lägger till en ny användare med validering av användarnamn och lösenord
         public bool AddUser(User user)
         {
+            
             // Validera användarnamn
             if (!ValidationHelper.IsValidUsername(user.Username))
             {
@@ -136,7 +138,17 @@ namespace FitTrack2._0.Model
         // Kontrollerar om ett användarnamn redan är taget
         public bool IsUsernameTaken(string username)
         {
-            return RegisteredUsers.All(u => u.Username == username);
+            try
+            {
+            var user= RegisteredUsers.First(u => u.Username == username); // Om det inte finns det användarnamnet
+            return user != null; 
+
+            }
+            catch(Exception ex) //Kastar ett fel, runtime exception
+            {
+
+            }
+            return false;  
         }
         public void SignOut()
         {

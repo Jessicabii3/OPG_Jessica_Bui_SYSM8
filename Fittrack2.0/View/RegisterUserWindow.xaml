@@ -50,6 +50,7 @@
                     Background="Transparent"
                     Width="100"
                     FontWeight="Bold"/>
+            <TextBlock Text="{Binding ErrorMessage}" Width="450"/>
         </StackPanel>
     </Grid>
 </Window>

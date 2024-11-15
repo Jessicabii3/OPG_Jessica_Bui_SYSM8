@@ -9,6 +9,7 @@ using System.Windows.Input;
 using System.Collections.ObjectModel;
 using FitTrack2._0.View;
 using System.Windows;
+using FitTrack2._0.Helpers;
 
 
 namespace FitTrack2._0.ViewModel
@@ -27,12 +28,13 @@ namespace FitTrack2._0.ViewModel
         public event Action RequestCloseDetails;
         public event Action WorkoutDeleted;
         public event Action WorkoutSaved;
+        public Window _workoutDetailsWindow;
 
         // Konstruktor som tar träningspasset, listan över träningspass och användarhanteraren
-        public WorkoutDetailsViewModel(Workout workout)
+        public WorkoutDetailsViewModel(Workout workout,Window workoutDetailsWindow)
         {
-
-            _workout = workout ?? throw new ArgumentNullException(nameof(workout));
+            _workoutDetailsWindow = workoutDetailsWindow;
+            _workout = workout;
             // Skapa en kopia av _workout beroende på dess typ
             if (_workout is StrengthWorkout strengthWorkout)
             {
@@ -43,7 +45,8 @@ namespace FitTrack2._0.ViewModel
                         strengthWorkout.Notes,              
                         strengthWorkout.Owner,              
                         strengthWorkout.Sets,               
-                        strengthWorkout.Reps                
+                        strengthWorkout.Reps,
+                        ValidationHelper.RandomId()
                        );
                 WorkoutCaloriesBurned = _originalWorkout.CalculateCaloriesBurned();
             }
@@ -54,7 +57,8 @@ namespace FitTrack2._0.ViewModel
                           cardioWorkout.Duration,             
                           cardioWorkout.Distance,             
                           cardioWorkout.Notes,               
-                          cardioWorkout.Owner                 
+                          cardioWorkout.Owner,
+                          ValidationHelper.RandomId()
                       );
                 WorkoutCaloriesBurned = _originalWorkout.CalculateCaloriesBurned();
             }
@@ -282,20 +286,15 @@ namespace FitTrack2._0.ViewModel
         // Metod för att kopiera träningspasset till listan över träningspass
         private void CopyWorkout()
         {
-            // En ny instans av AddWorkoutViewModel med kopierade fält från workout
-            //var addWorkoutWindow = new AddWorkoutWindow();
-            //var addWorkoutViewModel = new AddWorkoutViewModel(workoutsWindow)
-            //{
-            //    WorkoutDate = _workout.Date,
-            //    WorkoutType = _workout.Type,
-            //    WorkoutDuration = _workout.Duration,
-            //    WorkoutNotes = _workout.Notes,
-            //};
+            //En ny instans av AddWorkoutViewModel med kopierade fält från workout
+            var addWorkoutWindow = new AddWorkoutWindow();
 
-            //addWorkoutWindow.DataContext = addWorkoutViewModel;
+
+            var addWorkoutViewModel = new AddWorkoutViewModel(addWorkoutWindow,_workout );
           
-            //ShowNewWindow(addWorkoutWindow);
-
+            addWorkoutWindow.DataContext = addWorkoutViewModel;
+            addWorkoutWindow.Show();
+            _workoutDetailsWindow.Close();
 
         }
         private void SaveWorkout()

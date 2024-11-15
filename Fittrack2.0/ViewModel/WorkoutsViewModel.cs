@@ -9,19 +9,20 @@ using System.Windows;
 using System.Windows.Input;
 using FitTtrack2._0.ViewModel;
 using FitTrack2._0.ViewModel;
+using System.Diagnostics.Eventing.Reader;
 
 namespace FitTtrack2._0.ViewModel
 {
     public class WorkoutsViewModel :BaseViewModel
     {
         
-        private Workout _originalWorkout;
-        public ObservableCollection<Workout> Workouts { get; private set; } 
+        
+        public ObservableCollection<Workout> WorkoutsList { get; private set; } 
         private Workout? _selectedWorkout;
         private string _errorMessage = string.Empty;
         private readonly ManageUser _userManager = ManageUser.Instance;
         private readonly Window _workoutsWindow;
-
+        
 
         // Kommandon
         public RelayCommand AddWorkoutCommand { get; }
@@ -31,25 +32,24 @@ namespace FitTtrack2._0.ViewModel
         public RelayCommand LogOutCommand { get; }
         public RelayCommand ShowInfoCommand { get; }
         public RelayCommand OpenAddWorkoutWindowCommand { get; }
+        public RelayCommand ClearfilterCommand { get; }
         
-
-
         public WorkoutsViewModel(Window workoutsWindow)
         {
             
             _workoutsWindow = workoutsWindow;
-
-            Workouts = _userManager.LoggedInUser.UserWorkouts;
             AvailableTypes = new ObservableCollection<string> { "Cardio", "Strength" };
-            //LoadWorkouts();
+            LoadWorkouts();
 
             // Initialiserar kommandon
-            DeleteWorkoutCommand = new RelayCommand(_ => DeleteWorkout(), _ => CanDeleteWorkout());
+            DeleteWorkoutCommand = new RelayCommand(execute:e => DeleteWorkout(),canExecute: e => CanDeleteWorkout());
             OpenUserDetailsCommand = new RelayCommand(_ => OpenUserDetails());
             OpenWorkoutDetailsCommand = new RelayCommand(_ => OpenWorkoutDetails());
             LogOutCommand = new RelayCommand(_ => LogOut());
             OpenAddWorkoutWindowCommand = new RelayCommand(_ => OpenAddWorkoutWindow());
             ShowInfoCommand = new RelayCommand(_ => ShowInfo());
+            ClearfilterCommand = new RelayCommand(_ =>ClearFilter() );
+          
     }
 
         // Egenskap för att kontrollera om den inloggade användaren är admin
@@ -82,15 +82,17 @@ namespace FitTtrack2._0.ViewModel
         }
 
         // Filteregenskaper
-        private DateTime? _filterDate;
+        private DateTime? _filterDate = null;
         public DateTime? FilterDate
         {
             get => _filterDate;
             set
             {
                 _filterDate = value;
+               
                 OnPropertyChanged();
                 ApplyFilters();
+
             }
         }
 
@@ -101,22 +103,14 @@ namespace FitTtrack2._0.ViewModel
             set
             {
                 _filterType = value;
+                
                 OnPropertyChanged();
                 ApplyFilters();
-            }
-        }
 
-        private TimeSpan? _filterDuration;
-        public TimeSpan? FilterDuration
-        {
-            get => _filterDuration;
-            set
-            {
-                _filterDuration = value;
-                OnPropertyChanged();
-                ApplyFilters();
             }
         }
+        
+    
 
         // Metoder
         private void ShowInfo()
@@ -127,72 +121,164 @@ namespace FitTtrack2._0.ViewModel
 
         private void LoadWorkouts()
         {
-
+            WorkoutsList=new ObservableCollection<Workout>();
             if (_userManager.LoggedInUser == null)
             {
                 ErrorMessage = "Ingen användare är inloggad.";
                 return;
             }
 
+
             if (_userManager.LoggedInUser.Username == "Admin1" && IsAdmin)
             {
                 // Visa alla träningspass för admin
-                Workouts = new ObservableCollection<Workout>(_userManager.GetAllWorkouts());
+                WorkoutsList = new ObservableCollection<Workout>(_userManager.GetAllWorkouts());
+                return;
             }
-            else
+            if (_userManager.LoggedInUser is User)
             {
-                // Visa endast användarens egna träningspass
-                var userWorkouts = _userManager.GetWorkoutsForUser(_userManager.LoggedInUser?.Username);
-                Workouts = new ObservableCollection<Workout>(userWorkouts);
+                WorkoutsList = new ObservableCollection<Workout>(_userManager.LoggedInUser.UserWorkouts);
+                return;
             }
-            OnPropertyChanged(nameof(Workouts));
-            
+
+
         }
 
       
 
         private void DeleteWorkout()
         {
+            if(_userManager.LoggedInUser.Username != "Admin1")
+            {
             if (SelectedWorkout != null && CanDeleteWorkout())
             {
-                Workouts.Remove(SelectedWorkout);
+                Workout workoutRemove = null;
+              
+                foreach (Workout workout in _userManager.LoggedInUser.UserWorkouts)
+                {
+                    if (workout.Id == SelectedWorkout.Id)
+                    {
+                        
+                        workoutRemove = workout;
+                    }
+                   
+                }
+                if(workoutRemove != null)
+                {
+                    _userManager.LoggedInUser.UserWorkouts.Remove(workoutRemove);
+                }
+               
+
+                WorkoutsList.Remove(SelectedWorkout);
                 SelectedWorkout = null;
             }
             else
             {
                 ErrorMessage = "Välj ett träningspass att radera.";
             }
+
+            }
+            
+            //Hanterar borttagning som admin
+            if (_userManager.LoggedInUser.Username == "Admin1" && IsAdmin)
+            {
+                if (SelectedWorkout != null && CanDeleteWorkout())
+                {
+
+                    Workout workoutRemove = null;
+                    User owner = null;
+                    foreach (User user in _userManager.RegisteredUsers)
+                    {
+                        if (user.Username == SelectedWorkout.Owner)
+                        {
+                            owner = user;
+                        }
+
+                    }
+                    foreach (Workout workout in owner.UserWorkouts)
+                    {
+                        if (workout.Id == SelectedWorkout.Id)
+                        {
+
+                            workoutRemove = workout;
+                        }
+
+                    }
+                    if (workoutRemove != null)
+                    {
+                        owner.UserWorkouts.Remove(workoutRemove);
+                    }
+
+                    WorkoutsList.Remove(SelectedWorkout);
+                    SelectedWorkout = null;
+                }
+
+               
+
+                    //foreach (User user in _userManager.RegisteredUsers) //Loopar igenom alla användare
+                    //{
+                    //    foreach (Workout workout in _userManager.UserWorkouts)
+                    //    {
+                    //        if (workout.Id == SelectedWorkout.Id)
+                    //        {
+                    //            owner = user;
+                    //            workoutRemove = workout;
+                    //            break;
+                    //        }
+                    //    }
+                    //    if (owner != null)
+                    //    {
+                    //        break;
+                    //    }
+                    //}
+                    //if (workoutRemove != null && owner != null)
+                    //{
+                    //    owner.UserWorkouts.Remove(workoutRemove);
+                    //}
+
+                    //WorkoutsList.Remove(SelectedWorkout);
+                    //SelectedWorkout = null;
+
+
+                //}
+                //else
+                //{
+                //    ErrorMessage = "Välj ett träningspass att radera.";
+                //}
+            }
+
+
+
+              
+            
+           
         }
         private void ApplyFilters()
         {
-            var filteredWorkouts = _userManager.LoggedInUser.UserWorkouts;
+            WorkoutsList.Clear();
+           
 
-            if (FilterDate.HasValue)
-            {
-                var filterList = filteredWorkouts.Where(w => w.Date.Date == FilterDate.Value.Date).ToList();
-                foreach (var workout in filterList)
-                {
-                    Workouts.Add(workout);
-                }
-            }
+             _userManager.LoggedInUser.UserWorkouts.Where(workout =>
+                workout.Type==FilterType && (!FilterDate.HasValue || workout.Date == FilterDate
+                 )
                 
-            if (!string.IsNullOrWhiteSpace(FilterType))
+                )
+            .ToList()
+            .ForEach(WorkoutsList.Add); 
+
+        }
+        private void ClearFilter()
+        {
+            //Tar bort all data
+            WorkoutsList.Clear();
+           
+            
+            //populate workouts med userWorkout
+            foreach ( Workout workout in _userManager.LoggedInUser.UserWorkouts)
             {
-                var filterList = filteredWorkouts.Where(w => w.Type.Equals(FilterType, StringComparison.OrdinalIgnoreCase));
-                foreach(var workout in filterList)
-                {
-                    Workouts.Add(workout);
-                }
+                WorkoutsList.Add(workout);
             }
-            if (FilterDuration.HasValue)
-            {
-                var filterList= filteredWorkouts.Where(w => w.Duration >= FilterDuration.Value);
-                foreach(var workout in filterList)
-                {
-                    Workouts.Add(workout);
-                }
-            }
-               
+           
         }
 
         private bool CanDeleteWorkout() => SelectedWorkout != null;
@@ -201,17 +287,10 @@ namespace FitTtrack2._0.ViewModel
         // Metod för att öppna nytt fönster och stänga det aktuella fönstret
         private void ShowNewWindow(Window window)
         {
-            var currentWindow = Application.Current.Windows
-                   .OfType<Window>()
-                   .FirstOrDefault(w => w.DataContext == this);
-
-            currentWindow?.Close();  // Stäng det aktiva fönstret
-            window.Show();  // Öppna det nya fönstret
-
+            var currentWindow = Application.Current.Windows;
+   
         }
-        private void CloseCurrentWindow()
-        {
-        }
+      
 
         private void OpenAddWorkoutWindow()
         {
@@ -228,7 +307,8 @@ namespace FitTtrack2._0.ViewModel
         {
             
             var userDetailsWindow = new UserDetailsWindow();
-            ShowNewWindow(userDetailsWindow);
+            _workoutsWindow.Close();
+            userDetailsWindow.Show();
         }
 
         private void OpenWorkoutDetails()
@@ -238,24 +318,27 @@ namespace FitTtrack2._0.ViewModel
                 ErrorMessage = "Välj ett träningspass för att se detaljer.";
                 return;
             }
-            var workoutDetailsViewModel = new WorkoutDetailsViewModel(SelectedWorkout);
+            var workoutDetailsWindow = new WorkoutDetailsWindow();
+            var workoutDetailsViewModel = new WorkoutDetailsViewModel(SelectedWorkout, workoutDetailsWindow);
             workoutDetailsViewModel.WorkoutSaved += LoadWorkouts;
             workoutDetailsViewModel.RequestCloseDetails += () =>
             {
                 // Ladda om träningspass för att inkludera eventuella ändringar
                 LoadWorkouts();
             };
-            var workoutDetailsWindow = new WorkoutDetailsWindow(new WorkoutDetailsViewModel(SelectedWorkout));
-            ShowNewWindow(workoutDetailsWindow);
+            _workoutsWindow.Close();
+             workoutDetailsWindow.DataContext = workoutDetailsViewModel;
+            workoutDetailsWindow.Show();
 
 
         }
 
         private void LogOut()
         {
-           
+
             var mainWindow = new MainWindow();
-            ShowNewWindow(mainWindow);
+            _workoutsWindow.Close();
+            mainWindow.Show();
         }
        
        

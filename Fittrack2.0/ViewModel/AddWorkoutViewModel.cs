@@ -10,6 +10,7 @@ using System.Windows.Input;
 using System.Collections.ObjectModel;
 using FitTrack2._0.View;
 using System.Windows;
+using FitTrack2._0.Helpers;
 
 namespace FitTrack2._0.ViewModel
 {
@@ -188,12 +189,12 @@ namespace FitTrack2._0.ViewModel
            
             if (WorkoutType == "Strength")
             {
-                Workout = new StrengthWorkout(WorkoutDate, WorkoutType, WorkoutDuration, WorkoutNotes, _userManager.LoggedInUser.Username, WorkoutReps , WorkoutSets);
+                Workout = new StrengthWorkout(WorkoutDate, WorkoutType, WorkoutDuration, WorkoutNotes, _userManager.LoggedInUser.Username, WorkoutReps , WorkoutSets,ValidationHelper.RandomId());
                 WorkoutDistance = 0;
             }
             else if (WorkoutType == "Cardio")
             {
-                Workout = new CardioWorkout(WorkoutDate, WorkoutDuration, WorkoutDistance, WorkoutNotes,_userManager.LoggedInUser.Username);
+                Workout = new CardioWorkout(WorkoutDate, WorkoutDuration, WorkoutDistance, WorkoutNotes,_userManager.LoggedInUser.Username,ValidationHelper.RandomId());
                 WorkoutReps = 0;
                 WorkoutSets = 0;
             }
@@ -289,12 +290,12 @@ namespace FitTrack2._0.ViewModel
             }
             if(workoutType == "Strength")
             {
-                StrengthWorkout workout = new StrengthWorkout(date:WorkoutDate,type:WorkoutType,duration:WorkoutDuration,notes:WorkoutNotes,username:_userManager.LoggedInUser.Username,reps:WorkoutReps,sets:WorkoutSets);
+                StrengthWorkout workout = new StrengthWorkout(date:WorkoutDate,type:WorkoutType,duration:WorkoutDuration,notes:WorkoutNotes,username:_userManager.LoggedInUser.Username,reps:WorkoutReps,sets:WorkoutSets, ValidationHelper.RandomId());
                 _userManager.LoggedInUser.UserWorkouts.Add(workout);
             }
             if (workoutType == "Cardio")
             {
-                CardioWorkout workout = new CardioWorkout(date:WorkoutDate,duration:WorkoutDuration,distance: WorkoutDistance,notes: WorkoutNotes,owner:_userManager.LoggedInUser.Username);
+                CardioWorkout workout = new CardioWorkout(date:WorkoutDate,duration:WorkoutDuration,distance: WorkoutDistance,notes: WorkoutNotes,owner:_userManager.LoggedInUser.Username, ValidationHelper.RandomId());
                 _userManager.LoggedInUser.UserWorkouts.Add(workout);
             }
 

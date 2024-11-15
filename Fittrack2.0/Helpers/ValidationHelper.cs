@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace FitTrack2._0.Helpers
 {
@@ -20,6 +21,12 @@ namespace FitTrack2._0.Helpers
         public static bool IsValidUsername(string username)
         {
             return !string.IsNullOrEmpty(username) && username.Length >= 3;
+        }
+        public static int RandomId()
+        {
+            
+            Random random = new Random();
+            return random.Next(100, 999);
         }
     }
 }
